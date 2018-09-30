@@ -1,0 +1,5 @@
+type = custom/script
+exec = ~/.config/polybar/modules/taskwarrior/taskwarrior.sh
+click-left = ~/.config/polybar/modules/taskwarrior/taskwarrior.sh events
+
+interval = 5
