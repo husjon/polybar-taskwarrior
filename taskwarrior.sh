@@ -21,7 +21,9 @@ inform() {
         project=""
     fi
     if [[ $due_date ]]; then
-        if [[ $due_by ]]; then
+        if [[ $due_by == "overdue" ]]; then
+            due=" is <b>overdue</b>"
+        elif [[ $due_by ]]; then
             due=" is due by <b>$due_by</b>"
         else
             due=" is due by $due_date"
@@ -52,20 +54,17 @@ if [[ $1 == "events" ]]; then
     exit
 fi
 
-out=""
-if ((COUNT_DUE_TODAY > 0 || COUNT_OVERDUE > 0)); then
-    if ((COUNT_DUE_TODAY > 0)); then
-        out="$out ${COUNT_DUE_TODAY} task(s) due today"
-    fi
-    if ((COUNT_OVERDUE > 0)); then
-        out="$out (${COUNT_OVERDUE} OVERDUE)"
-    fi
-elif (( COUNT_DUE_SOON > 0 )); then
-    out="$out ${COUNT_DUE_SOON} task(s) due soon"
-elif (( COUNT_DUE_NEVER > 0 )); then
-    out="$out ${COUNT_DUE_NEVER} other task(s)"
-else
-    out=""
-fi
+output() {
+    (( $1 == 1 )) && tasks_string="task" || tasks_string="tasks"
+    echo $1 $tasks_string $2
+    exit 0
+}
 
-echo ${out}
+((COUNT_OVERDUE   > 0)) && output "${COUNT_OVERDUE}"   "overdue"
+((COUNT_DUE_TODAY > 0)) && output "${COUNT_DUE_TODAY}" "due today"
+((COUNT_DUE_SOON  > 0)) && output "${COUNT_DUE_SOON}"  "due soon"
+
+((COUNT_OVERDUE + COUNT_DUE_TODAY + COUNT_DUE_SOON == 0)) && \
+    output "${COUNT_DUE_NEVER}" "due some day"
+
+output ""
