@@ -31,7 +31,7 @@ inform() {
     else
         due=""
     fi
-    notify-send "taskwarrior" "$project<u>$desc</u>$due"
+    notify-send -t 0 "taskwarrior" "$project<u>$desc</u>$due"
 }
 
 if [[ $1 == "events" ]]; then
