@@ -1,5 +1,10 @@
 #!/bin/bash
 
+RED=$(xrdb_q color1)
+YELLOW=$(xrdb_q color11)
+ORANGE=$(xrdb_q color3)
+GREEN=$(xrdb_q color2)
+
 COUNT_OVERDUE=$(task +OVERDUE count)
 COUNT_DUE_TODAY=$(task +PENDING +TODAY count)
 COUNT_DUE_SOON=$(task +DUE +READY count)
@@ -55,16 +60,22 @@ if [[ $1 == "events" ]]; then
 fi
 
 output() {
-    (( $1 == 1 )) && tasks_string="task" || tasks_string="tasks"
-    echo $1 $tasks_string $2
+    COLOR=${3:-""}
+    (( $1 == 0 )) && {
+        echo "%{F#$COLOR}$2%{F-}"
+        exit 0
+    }
+
+    (( $1 >= 1 )) && tasks_string="task" || tasks_string="tasks"
+    echo "%{F#$COLOR}$1 $tasks_string $2%{F-}"
     exit 0
 }
 
-((COUNT_OVERDUE   > 0)) && output "${COUNT_OVERDUE}"   "overdue"
-((COUNT_DUE_TODAY > 0)) && output "${COUNT_DUE_TODAY}" "due today"
-((COUNT_DUE_SOON  > 0)) && output "${COUNT_DUE_SOON}"  "due soon"
+((COUNT_OVERDUE   > 0)) && output "${COUNT_OVERDUE}"   "overdue"    "$RED"
+((COUNT_DUE_TODAY > 0)) && output "${COUNT_DUE_TODAY}" "due today"  "$ORANGE"
+((COUNT_DUE_SOON  > 0)) && output "${COUNT_DUE_SOON}"  "due soon"   "$YELLOW"
 
 ((COUNT_OVERDUE + COUNT_DUE_TODAY + COUNT_DUE_SOON == 0)) && \
-    output "${COUNT_DUE_NEVER}" "due some day"
+    output "${COUNT_DUE_NEVER}" "due some day" "$GREEN"
 
-output ""
+output "0" "" "$GREEN"
