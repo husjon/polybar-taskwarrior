@@ -8,7 +8,7 @@ GREEN=$(xrdb_q color2)
 COUNT_OVERDUE=$(task +OVERDUE count)
 COUNT_DUE_TODAY=$(task +PENDING +TODAY count)
 COUNT_DUE_SOON=$(task +DUE +READY count)
-COUNT_DUE_NEVER=$(task -DUE +READY count)
+COUNT_DUE_NEVER=$(task project: -DUE +READY count)
 
 TASK_LIMIT=${TASK_LIMIT:-5}
 
