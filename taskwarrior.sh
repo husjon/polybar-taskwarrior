@@ -47,10 +47,10 @@ inform() {
 if [[ $1 == "events" ]]; then
     flavour_text=""
 
-    if (($COUNT_OVERDUE > 0)); then
+    if ((COUNT_OVERDUE > 0)); then
         time_restriction="+OVERDUE"
         flavour_text="overdue"
-    elif (($COUNT_DUE_TODAY > 0)); then
+    elif ((COUNT_DUE_TODAY > 0)); then
         time_restriction="+DUE +TODAY"
         flavour_text="today"
     elif ((COUNT_DUE_SOON > 0)); then
@@ -58,29 +58,37 @@ if [[ $1 == "events" ]]; then
     else
         time_restriction=""
     fi
-    for event_id in $($task_list $time_restriction | head -n -1 | awk '/^[0-9]+/ {print $1}'); do
-        inform $event_id $flavour_text
+    for event_id in $($task_list "$time_restriction" | head -n -1 | awk '/^[0-9]+/ {print $1}'); do
+        inform "$event_id" "$flavour_text"
     done
     exit
 fi
 
 output() {
     COLOR=${3:-""}
-    (( $1 == 0 )) && {
+    if (( $1 == 0 )); then
         echo "%{F#$COLOR}$2%{F-}"
         exit 0
-    }
+    fi
 
-    (( $1 >= 1 )) && tasks_string="task" || tasks_string="tasks"
+    if (( $1 >= 1 )); then
+        tasks_string="task"
+    else
+        tasks_string="tasks"
+    fi
+
     echo "%{F#$COLOR}$1 $tasks_string $2%{F-}"
     exit 0
 }
 
-((COUNT_OVERDUE   > 0)) && output "${COUNT_OVERDUE}"   "overdue"    "$RED"
-((COUNT_DUE_TODAY > 0)) && output "${COUNT_DUE_TODAY}" "due today"  "$ORANGE"
-((COUNT_DUE_SOON  > 0)) && output "${COUNT_DUE_SOON}"  "due soon"   "$YELLOW"
-
-((COUNT_OVERDUE + COUNT_DUE_TODAY + COUNT_DUE_SOON == 0)) && \
+if ((COUNT_OVERDUE   > 0)); then
+    output "${COUNT_OVERDUE}"   "overdue"    "$RED"
+elif ((COUNT_DUE_TODAY > 0)); then
+    output "${COUNT_DUE_TODAY}" "due today"  "$ORANGE"
+elif ((COUNT_DUE_SOON  > 0)); then
+    output "${COUNT_DUE_SOON}"  "due soon"   "$YELLOW"
+elif ((COUNT_OVERDUE + COUNT_DUE_TODAY + COUNT_DUE_SOON == 0)); then
     output "${COUNT_DUE_NEVER}" "due some day" "$GREEN"
-
-output "0" "" "$GREEN"
+else
+    output "0" "" "$GREEN"
+fi
