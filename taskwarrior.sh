@@ -1,9 +1,14 @@
 #!/bin/bash
 
-RED=$(xrdb_q color1)
-YELLOW=$(xrdb_q color11)
-ORANGE=$(xrdb_q color3)
-GREEN=$(xrdb_q color2)
+# shellcheck disable=2164
+cd "$(dirname "$(realpath "$0")")"
+
+source ./config 2>/dev/null
+
+RED=${RED:-ff0000}
+YELLOW=${YELLOW:-ffff00}
+ORANGE=${ORANGE:-ffaa00}
+GREEN=${GREEN:-00ff00}
 
 COUNT_OVERDUE=$(task +OVERDUE count)
 COUNT_DUE_TODAY=$(task +PENDING +TODAY count)
